@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import axios from "axios";
 import SwiperCore from "swiper";
 import "swiper/css/bundle";
 import ListingItem from "../components/ListingItem";
@@ -16,6 +17,7 @@ export default function Home() {
     const fetchOfferListings = async () => {
       try {
         const res = await fetch("/api/listing/get?offer=true&limit=3");
+
         const data = await res.json();
         setOfferListings(data);
         fetchRentListings();
@@ -49,12 +51,12 @@ export default function Home() {
     <div>
       {/* top */}
       <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
-        <h1 className="text-slate-700 font-bold text-3xl lg:text-6xl">
-          Unlock the <span className="text-slate-500">Door to </span>
+        <h1 className="text-[#2973B2] font-bold text-3xl lg:text-6xl">
+          Unlock the <span className="text-[#9ACBD0]">Door to </span>
           <br />
           Your Perfect Home
         </h1>
-        <div className="text-gray-400 text-xs sm:text-sm">
+        <div className="text-[#48A6A7] text-2xl sm:text-sm">
           Welcome to Rent Roost, where finding your dream home is effortless.
           <br />
           Discover curated rentals tailored to your lifestyle today!
@@ -72,16 +74,13 @@ export default function Home() {
       <Swiper navigation>
         {offerListings &&
           offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            <SwiperSlide key={listing._id}>
-              <div
-                style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: "cover",
-                }}
-                className="h-[500px]"
-                key={listing._id}
-              ></div>
+          offerListings.map((listing, index) => (
+            <SwiperSlide key={index}>
+              <img
+                src={listing.imageUrls[0]}
+                alt={`Slide ${index}`}
+                className="h-[550px] w-[98%] object-cover mx-auto"
+              />
             </SwiperSlide>
           ))}
       </Swiper>
@@ -93,13 +92,13 @@ export default function Home() {
           <div className="">
             <div className="my-3">
               <h2 className="text-2xl font-semibold text-slate-600">
-                Recent offers
+                Recent offers 🎉
               </h2>
               <Link
                 className="text-sm text-blue-800 hover:underline"
                 to={"/search?offer=true"}
               >
-                Show more offers
+                Show more offers 👌👌
               </Link>
             </div>
             <div className="flex flex-wrap gap-4">
@@ -113,7 +112,7 @@ export default function Home() {
           <div className="">
             <div className="my-3">
               <h2 className="text-2xl font-semibold text-slate-600">
-                Recent places for rent
+                Recent places for rent 😉
               </h2>
               <Link
                 className="text-sm text-blue-800 hover:underline"
@@ -133,7 +132,7 @@ export default function Home() {
           <div className="">
             <div className="my-3">
               <h2 className="text-2xl font-semibold text-slate-600">
-                Recent places for sale
+                Recent places for sale 😎
               </h2>
               <Link
                 className="text-sm text-blue-800 hover:underline"

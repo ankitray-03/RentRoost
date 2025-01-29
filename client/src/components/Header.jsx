@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { FaHome } from "react-icons/fa";
+import { AlignEndVertical } from "lucide-react";
 
 import { FaSignInAlt } from "react-icons/fa";
 
@@ -30,12 +31,15 @@ export default function Header() {
     }
   }, [location.search]);
   return (
-    <header className="bg-slate-200 shadow-md">
+    <header className="bg-[#9ACBD0] shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to="/">
           <h1 className="font-bold text-sm sm:text-xl flex flex-wrap">
+            <span className="mr-2">
+              <AlignEndVertical size={40} />
+            </span>
             <span className="text-slate-500">Rent</span>
-            <span className="text-slate-700">Roost</span>
+            <span className="text-slate-700 ">Roost</span>
           </h1>
         </Link>
         <form

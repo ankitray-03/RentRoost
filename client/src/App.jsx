@@ -14,6 +14,7 @@ import Search from "./pages/Search";
 import Privacy from "./pages/Privacy.jsx";
 
 import ContactUs from "./pages/ContactUs.jsx";
+import SuccessPage from "./pages/SuccessPage.jsx";
 
 export default function App() {
   return (
@@ -35,6 +36,10 @@ export default function App() {
           <Route
             path="/update-listing/:listingId"
             element={<UpdateListing />}
+          />
+          <Route
+            path="/listing/payment/success/:paymentId/:orderId"
+            element={<SuccessPage />}
           />
         </Route>
       </Routes>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
+import axios from "axios";
 import { useSelector } from "react-redux";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
@@ -26,6 +27,60 @@ export const Listing = () => {
   const [contact, setContact] = useState(false);
 
   const { currentUser } = useSelector((store) => store.user);
+
+  const handlePaymentSuccess = async (response) => {
+    console.log(listing);
+    const res = await axios.post("/api/booking/booking-success", {
+      ...response,
+      email: currentUser.email,
+      name: currentUser.username,
+      listingId: listing._id,
+      landlordId: listing.userRef,
+      amount: listing.offer ? listing.discountPrice : listing.regularPrice,
+    });
+
+    if (res.status === 200) {
+      window.location.href = `/listing/payment/success/${res.data.razorpay_payment_id}/${res.data.razorpay_order_id}`;
+    } else {
+      console.log("Payment failed");
+    }
+  };
+  const handleBookNow = async () => {
+    const response = await axios.post("/api/booking/create-order", {
+      amount: listing.offer ? listing.discountPrice : listing.regularPrice,
+    });
+
+    const order = response.data;
+
+    // checkout
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_API_ID,
+      amount: order.amount,
+      currency: "INR",
+      name: "Ankit Ray",
+      description: "Booking hotel",
+      image:
+        "https://i.pinimg.com/originals/4f/09/ee/4f09eeda4a01e56c6bfde7bcbd706779.jpg",
+      order_id: order.id,
+      handler: function (response) {
+        handlePaymentSuccess(response);
+      },
+      prefill: {
+        name: currentUser.username,
+        email: currentUser.email,
+        contact: "9000090000",
+      },
+      notes: {
+        address: "Razorpay Corporate Office",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+    razor.open();
+  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -61,15 +116,13 @@ export const Listing = () => {
       {listing && !loading && !error && (
         <div>
           <Swiper navigation>
-            {listing.imageUrls.map((url) => (
-              <SwiperSlide key={url}>
-                <div
-                  className="h-[550px]"
-                  style={{
-                    background: `url(${url}) center no-repeat`,
-                    backgroundSize: "cover",
-                  }}
-                ></div>
+            {listing.imageUrls.map((url, index) => (
+              <SwiperSlide key={index}>
+                <img
+                  src={url}
+                  alt={`Slide ${index}`}
+                  className="h-[550px] w-full object-cover"
+                />
               </SwiperSlide>
             ))}
           </Swiper>
@@ -92,7 +145,7 @@ export const Listing = () => {
           )}
           <div className="flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4">
             <p className="text-2xl font-semibold">
-              {listing.name} - ${" "}
+              {listing.name} - ₹{" "}
               {listing.offer
                 ? listing.discountPrice.toLocaleString("en-US")
                 : listing.regularPrice.toLocaleString("en-US")}
@@ -108,7 +161,7 @@ export const Listing = () => {
               </p>
               {listing.offer && (
                 <p className="bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
-                  ${+listing.regularPrice - +listing.discountPrice} OFF
+                  ₹ {+listing.regularPrice - +listing.discountPrice} OFF
                 </p>
               )}
             </div>
@@ -139,12 +192,20 @@ export const Listing = () => {
               </li>
             </ul>
             {currentUser && listing.userRef !== currentUser._id && !contact && (
-              <button
-                onClick={() => setContact(true)}
-                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
-              >
-                Contact landlord
-              </button>
+              <>
+                <button
+                  className="bg-blue-600 text-white rounded-lg uppercase hover:opacity-95 p-3"
+                  onClick={() => handleBookNow()}
+                >
+                  Book Now
+                </button>
+                <button
+                  onClick={() => setContact(true)}
+                  className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
+                >
+                  Contact landlord
+                </button>
+              </>
             )}
             {contact && <Contact listing={listing} />}
           </div>
